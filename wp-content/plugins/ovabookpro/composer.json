@@ -1,0 +1,13 @@
+{
+    "require": {
+        "google/recaptcha": "^1.2.4",
+        "pelago/emogrifier": "^7.2",
+        "mpdf/mpdf": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BookPro\\": "includes/"
+        },
+        "classmap": ["includes/"]
+    }
+}

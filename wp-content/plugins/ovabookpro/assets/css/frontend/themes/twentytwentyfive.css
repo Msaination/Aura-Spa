@@ -1,0 +1,125 @@
+.obp-page .wp-block-post-title {
+  text-align: center; }
+
+.obp-login .obp-login-wrapper .obp-messages .message {
+  margin-bottom: 10px; }
+.obp-login .obp-login-wrapper #obp-loginform p {
+  margin: 0px; }
+.obp-login .obp-login-wrapper #obp-loginform label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 5px; }
+.obp-login .obp-login-wrapper #obp-loginform input[type="text"], .obp-login .obp-login-wrapper #obp-loginform input[type="password"] {
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+  font-size: 18px;
+  box-sizing: border-box;
+  padding: 0px 12px; }
+.obp-login .obp-login-wrapper #obp-loginform input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.5); }
+  .obp-login .obp-login-wrapper #obp-loginform input[type="checkbox"]:focus {
+    border: 0;
+    outline: 0; }
+.obp-login .obp-login-wrapper #obp-loginform #user_login {
+  margin-bottom: 10px; }
+.obp-login .obp-login-wrapper #obp-loginform .login-submit {
+  margin-top: 20px; }
+.obp-login .obp-login-wrapper #obp-loginform .button {
+  display: inline-block;
+  padding: 10px 30px;
+  font-size: 20px;
+  cursor: pointer; }
+
+.obp-register-user .obp-register-user-wrapper .obp-messages .message {
+  margin-bottom: 10px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form p {
+  margin: 0px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 5px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form input[type="text"], .obp-register-user .obp-register-user-wrapper .obp-register-user-form input[type="email"] {
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+  font-size: 18px;
+  box-sizing: border-box;
+  padding: 0px 12px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.5); }
+  .obp-register-user .obp-register-user-wrapper .obp-register-user-form input[type="checkbox"]:focus {
+    border: 0;
+    outline: 0; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form #user_login {
+  margin-bottom: 10px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form .login-submit {
+  margin-top: 20px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form .description {
+  margin: 10px 0px; }
+.obp-register-user .obp-register-user-wrapper .obp-register-user-form button {
+  display: inline-block;
+  padding: 10px 30px;
+  font-size: 20px;
+  cursor: pointer; }
+
+.obp-forgot-password .obp-forgot-password-wrapper .obp-forgot-password-form p {
+  margin: 0px; }
+.obp-forgot-password .obp-forgot-password-wrapper .obp-forgot-password-form label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 5px; }
+.obp-forgot-password .obp-forgot-password-wrapper .obp-forgot-password-form input[type="text"], .obp-forgot-password .obp-forgot-password-wrapper .obp-forgot-password-form input[type="email"] {
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+  font-size: 18px;
+  box-sizing: border-box;
+  padding: 0px 12px; }
+.obp-forgot-password .obp-forgot-password-wrapper .obp-forgot-password-form button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 30px;
+  font-size: 20px;
+  cursor: pointer; }
+
+.obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form p {
+  margin: 0px; }
+.obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 5px; }
+.obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form input[type="password"], .obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form input[type="text"] {
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+  font-size: 18px;
+  box-sizing: border-box;
+  padding: 0px 12px;
+  margin-bottom: 10px; }
+.obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form button {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 30px;
+  font-size: 20px;
+  cursor: pointer; }
+.obp-reset-password .obp-reset-password-wrapper .obp-reset-password-form .description {
+  font-size: 16px;
+  margin-top: 10px; }
+
+.obp-wrapper .obp-content-type .type-list-wrapper .obp_type_list_table th {
+  text-align: left;
+  padding: 10px 0px; }
+.obp-wrapper .obp-content-type .type-list-wrapper .obp_type_list_table td {
+  padding: 10px 0px; }
+
+body.rtl .obp-wrapper .obp-content-type .type-list-wrapper .obp_type_list_table th {
+  text-align: right; }
+  body.rtl .obp-wrapper .obp-content-type .type-list-wrapper .obp_type_list_table th:last-child {
+    text-align: left; }

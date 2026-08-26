@@ -1,0 +1,136 @@
+ID,Summary,Issue Type,Priority,Sprint,Assignee,Story Points,Acceptance Criteria,Labels,Parent Epic
+AURA-101,Audit existing AuraBookPro data model and plugin architecture,Story,Highest,Sprint 1,"Product Owner; Backend Engineer",3,"- Business, service, staff, plan, type, coupon, wallet, and booking entities are mapped
+- WordPress custom post types and metadata sources are documented
+- Payment dependencies are identified
+- Unknowns and risks are captured in migration notes","migration; discovery; architecture","E01"
+AURA-102,Define headless architecture and migration strategy,Story,Highest,Sprint 1,"Solution Architect; Product Owner",2,"- WordPress is defined as backend/admin system
+- Next.js is defined as public frontend
+- API strategy is approved
+- Auth model is approved
+- Deployment and rollback approach is documented","migration; architecture; planning","E01"
+AURA-103,Create sprint plan and dependency map,Story,Highest,Sprint 1,Project Manager,2,"- Backlog is sequenced by dependency
+- Each sprint has defined goals and deliverables
+- Owner assignments are clear
+- Dependencies are visible","planning; backlog; sprint","E01"
+AURA-201,Expose business directory API,Story,Highest,Sprint 2,Backend Engineer,5,"- GET /wp-json/aurabookpro/v1/businesses returns paginated list
+- Filters support category, city, search, and sort
+- GET /businesses/:id returns a full record
+- Public/private field separation is enforced","api; backend; business","E02"
+AURA-202,Expose service and type APIs,Story,Highest,Sprint 2,Backend Engineer,4,"- GET /services returns public service records
+- GET /services/:id returns a single service
+- GET /types returns all types
+- Pricing and duration fields are included
+- Service-business relationships are mapped correctly","api; backend; services","E02"
+AURA-203,Expose availability and calendar APIs,Story,Highest,Sprint 3,Backend Engineer,6,"- GET /availability returns valid slots by date and service
+- Staff-specific availability works
+- Business hours and exceptions are respected
+- Invalid dates return clear error payloads","api; booking; availability","E02"
+AURA-204,Create customer auth and session API,Story,Highest,Sprint 2,Backend Engineer,5,"- Login API works with WP user credentials
+- Registration API creates account and default role
+- Logout invalidates session
+- Password reset flow exists
+- Unauthenticated requests are rejected appropriately","api; auth; security","E02"
+AURA-205,Create profile and account API,Story,High,Sprint 2,Backend Engineer,3,"- GET /me returns authenticated customer profile
+- PUT /me/profile updates valid profile fields
+- Validation exists for name, email, phone, and address
+- Unauthorized access is rejected","api; profile; customer","E02"
+AURA-206,Create order and payment API,Story,Highest,Sprint 6,Backend Engineer,7,"- POST /orders/create creates order and booking lock
+- GET /orders/:id returns order data
+- POST /payment/confirm processes callback
+- Payment failure returns structured error
+- Payment status transitions are consistent","api; payment; orders","E02"
+AURA-207,Expose customer bookings and wishlist APIs,Story,High,Sprint 5,Backend Engineer,3,"- GET /me/bookings returns booking history
+- GET /me/wishlist returns saved businesses/services
+- Booking list includes status and timestamps
+- Wishlist endpoints enforce user authentication","api; customer; bookings","E02"
+AURA-208,Expose wallet and payout APIs,Story,Medium,Sprint 5,Backend Engineer,4,"- GET /me/wallet returns balances and transactions
+- Vendor payout endpoints are available for staff roles
+- Data is formatted consistently
+- Access control is enforced","api; wallet; payouts","E02"
+AURA-301,Build marketing homepage and navigation,Story,Highest,Sprint 3,Frontend Engineer,3,"- Homepage renders on desktop and mobile
+- Business categories and CTAs are visible
+- Navigation links to key pages work
+- Page is SEO-optimized","frontend; marketing; homepage","E03"
+AURA-302,Build business listing page,Story,Highest,Sprint 3,Frontend Engineer,5,"- /businesses page shows list of businesses
+- Search and filters work
+- Pagination works
+- Empty state displays when no results","frontend; listings; search","E03"
+AURA-303,Build business detail page,Story,Highest,Sprint 3,Frontend Engineer,5,"- /business/[slug] loads and displays business profile
+- Services are displayed
+- CTA to start booking is present
+- Missing business state is handled","frontend; business; detail","E03"
+AURA-304,Build service detail page,Story,High,Sprint 3,Frontend Engineer,3,"- /service/[slug] displays service details
+- Pricing, duration, and details are visible
+- CTA to book service works
+- Error state is handled","frontend; service; detail","E03"
+AURA-305,Build search and discovery UX,Story,High,Sprint 3,Frontend Engineer,3,"- Search works across business and service content
+- Filter controls respond correctly
+- Results update without full page reload
+- No-result state is shown","frontend; search; discovery","E03"
+AURA-401,Implement booking selection flow,Story,Highest,Sprint 4,Frontend Engineer,7,"- Users can select business and service
+- Date selection is supported
+- Available slots appear
+- Selected slot is highlighted and persisted
+- Invalid selection is blocked","frontend; booking; flow","E04"
+AURA-402,Integrate booking creation API,Story,Highest,Sprint 4,"Frontend Engineer; Backend Engineer",5,"- Booking creation posts valid payload to backend
+- Booking validation prevents conflicts
+- Response includes booking ID and status
+- User sees clear success/error states","frontend; backend; booking","E04"
+AURA-403,Build checkout and order review page,Story,Highest,Sprint 4,Frontend Engineer,5,"- Summary page shows business, service, date, and total
+- Coupon input works when enabled
+- Payment method selection is available
+- User can confirm booking
+- Validation errors display cleanly","frontend; checkout; payment","E04"
+AURA-404,Build confirmation and success pages,Story,High,Sprint 4,Frontend Engineer,3,"- Confirmation page shows booking confirmation
+- Booking reference and summary are visible
+- Free booking and paid flow both work
+- Failure state and retry path are available","frontend; confirmation; success","E04"
+AURA-501,Build login and registration experience,Story,High,Sprint 5,Frontend Engineer,3,"- Login page is functional
+- Registration page is functional
+- Validation and error states appear
+- Success redirects to dashboard
+- Unauthenticated access redirects correctly","frontend; auth; account","E05"
+AURA-502,Build customer dashboard,Story,High,Sprint 5,Frontend Engineer,5,"- Dashboard loads profile summary
+- Upcoming bookings are visible
+- Empty state is handled
+- Navigation to booking details works","frontend; dashboard; customer","E05"
+AURA-503,Build booking history and detail pages,Story,High,Sprint 5,Frontend Engineer,5,"- Booking history lists all user bookings
+- Detail page shows order/booking summary
+- Cancel flow is supported where allowed
+- Error state is handled","frontend; bookings; history","E05"
+AURA-504,Build wishlist and wallet pages,Story,Medium,Sprint 5,Frontend Engineer,4,"- Wishlist page renders saved items
+- Wallet page shows balance and transactions
+- Auth guard is enforced
+- Empty states are shown when no data exists","frontend; wallet; wishlist","E05"
+AURA-601,Build vendor dashboard shell,Story,High,Sprint 7,Frontend Engineer,3,"- Vendor dashboard loads after login
+- Navigation works
+- Summary cards render key metrics
+- Access control is enforced","frontend; vendor; dashboard","E06"
+AURA-602,Build vendor service management,Story,High,Sprint 7,"Frontend Engineer; Backend Engineer",5,"- Service listing loads
+- Add/edit/delete service actions work
+- Validation for required fields is present
+- Success/error states are handled","frontend; vendor; services","E06"
+AURA-603,Build vendor staff management and schedule view,Story,High,Sprint 7,"Frontend Engineer; Backend Engineer",7,"- Staff list loads
+- Add/edit/delete flows work
+- Schedule view renders availability
+- Conflicts or invalid availability are prevented","frontend; vendor; staff; schedule","E06"
+AURA-604,Build vendor booking management,Story,High,Sprint 7,"Frontend Engineer; Backend Engineer",5,"- Booking list loads
+- Status update actions work
+- Filters by date and status are available
+- Booking detail page loads summary and actions","frontend; vendor; bookings","E06"
+AURA-701,Perform end-to-end booking QA,Story,Highest,Sprint 8,QA Engineer,5,"- Booking happy path passes
+- Invalid date and slot selection are blocked
+- Payment and free booking flows pass
+- Confirmation and history are correct","qa; booking; regression","E07"
+AURA-702,Validate security and role access,Story,Highest,Sprint 8,"QA Engineer; Backend Engineer",3,"- Authenticated routes block unauthenticated access
+- Vendor-only routes are restricted
+- Admin-only routes are restricted
+- API validation and error responses are correct","qa; security; roles","E07"
+AURA-703,Optimize performance and SEO,Story,High,Sprint 8,"Frontend Engineer; DevOps",3,"- Target Lighthouse scores are achieved
+- Image optimization and code splitting are implemented
+- SEO metadata is present on key pages
+- Core pages pass responsiveness checks","performance; seo; frontend","E07"
+AURA-704,Execute launch cutover and rollback plan,Story,Highest,Sprint 8,"DevOps; Product Owner",3,"- Production environment is configured
+- DNS and routes are tested
+- Rollback plan is confirmed
+- Launch checklist is signed off","launch; deployment; cutover","E07"

@@ -1,0 +1,44 @@
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+frontend/.env
+frontend/.env.*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PHP / WordPress local artifacts
+wp-content/uploads/*
+!wp-content/uploads/.gitkeep
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/temp/
+wp-content/debug.log
+
+# Local environment files
+.env
+.env.*
+
+# Build / generated files
+coverage/
+*.tsbuildinfo
+
+# WordPress Studio / local-specific runtime files
+wp-content/mu-plugins/sqlite-database-integration/
+wp-content/db.php
