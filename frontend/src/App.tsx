@@ -52,6 +52,7 @@ const eventMoments = [
 function App() {
   const [services, setServices] = useState<BookingServiceOption[]>([])
   const [loadingServices, setLoadingServices] = useState(false)
+  const [bookingError, setBookingError] = useState('')
   const [form, setForm] = useState({
     service_id: 0,
     date: '2026-09-05',
@@ -105,22 +106,27 @@ function App() {
   const handleBookTreatment = async (event?: React.SyntheticEvent<HTMLElement>) => {
     event?.preventDefault()
     setSubmitting(true)
+    setBookingError('')
 
     try {
+      const customerName = `${form.first_name} ${form.last_name}`.trim()
       const result = await createBookingOrder({
-        service_id: Number(form.service_id),
-        date: form.date,
-        time: form.time,
+        serviceId: String(form.service_id),
+        appointmentDate: form.date,
+        appointmentTime: form.time,
         amount: Number(form.amount),
-        first_name: form.first_name,
-        last_name: form.last_name,
-        email: form.email,
+        customerName,
+        customerEmail: form.email,
+        phone: '',
+        notes: 'Spa booking from Aura Spa frontend',
       })
 
-      if (result.checkout_url) {
-        window.location.href = result.checkout_url
+      if (result.checkoutUrl) {
+        window.location.href = result.checkoutUrl
       }
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to create your booking right now.'
+      setBookingError(message)
       console.error('Failed to create booking order', error)
     } finally {
       setSubmitting(false)
@@ -302,6 +308,12 @@ function App() {
           </div>
 
           <form onSubmit={handleBookTreatment} className="grid gap-4 md:grid-cols-2">
+            {bookingError ? (
+              <div className="md:col-span-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {bookingError}
+              </div>
+            ) : null}
+
             <label className="flex flex-col gap-2 text-sm font-medium text-[#2b2624]">
               Service
               <select
@@ -315,7 +327,7 @@ function App() {
                 ) : (
                   services.map((service) => (
                     <option key={service.id} value={service.id}>
-                      {service.title} — R {service.price.toFixed(2)}
+                      {service.name} — R {service.price.toFixed(2)}
                     </option>
                   ))
                 )}
@@ -385,7 +397,7 @@ function App() {
 
             <div className="md:col-span-2 flex justify-end">
               <Button type="submit" className="rounded-full bg-[#2b2624] text-white hover:bg-[#1d1a18]" disabled={submitting}>
-                {submitting ? 'Processing...' : 'Continue to PayFast'}
+                {submitting ? 'Preparing your booking...' : 'Continue to PayFast'}
               </Button>
             </div>
           </form>

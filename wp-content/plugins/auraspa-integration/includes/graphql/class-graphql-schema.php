@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
 class AuraSpa_Integration_GraphQL_Schema {
     public static function register() {
         register_graphql_object_type('AuraSpaService', [
-            'description' => __('A spa service record from BookPro or WooCommerce product metadata.', 'auraspa-integration'),
+            'description' => __('A spa treatment service from BookPro.', 'auraspa-integration'),
             'fields' => [
                 'id' => ['type' => 'ID'],
                 'name' => ['type' => 'String'],
@@ -34,7 +34,7 @@ class AuraSpa_Integration_GraphQL_Schema {
             ],
         ]);
 
-        register_graphql_field('RootQuery', 'services', [
+        register_graphql_field('RootQuery', 'auraSpaServices', [
             'type' => ['list_of' => 'AuraSpaService'],
             'description' => __('List available spa services from BookPro.', 'auraspa-integration'),
             'args' => [
@@ -62,7 +62,7 @@ class AuraSpa_Integration_GraphQL_Schema {
             },
         ]);
 
-        register_graphql_field('RootQuery', 'booking', [
+        register_graphql_field('RootQuery', 'auraSpaBooking', [
             'type' => 'AuraSpaBooking',
             'description' => __('Fetch a booking by WooCommerce order ID.', 'auraspa-integration'),
             'args' => [
@@ -87,7 +87,7 @@ class AuraSpa_Integration_GraphQL_Schema {
                     'status' => $order->get_status(),
                     'serviceId' => (string) $order->get_meta('_aura_service_id', true),
                     'amount' => floatval($order->get_total()),
-                    'customerName' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+                    'customerName' => trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()),
                     'customerEmail' => $order->get_billing_email(),
                     'appointmentDate' => $order->get_meta('_aura_booking_date', true),
                     'appointmentTime' => $order->get_meta('_aura_booking_time', true),

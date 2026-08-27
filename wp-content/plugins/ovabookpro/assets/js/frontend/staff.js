@@ -831,6 +831,7 @@
                     'nickname': nickname,
                     'position': position,
                     'description': description,
+                    'staff_role': role,
                     'role': role,
                     'password': password,
                 };

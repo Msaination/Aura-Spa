@@ -6,41 +6,67 @@ if (!defined('ABSPATH')) {
 
 class AuraSpa_Integration_BookPro_Sync {
     public static function get_services($limit = 20) {
-        if (!function_exists('obp_get_service')) {
-            return [];
+        $items = [];
+
+        if (function_exists('obp_get_service')) {
+            $args = [
+                'post_type' => 'obp_service',
+                'post_status' => 'publish',
+                'posts_per_page' => absint($limit),
+                'orderby' => 'title',
+                'order' => 'ASC',
+                'fields' => 'ids',
+            ];
+
+            $service_ids = get_posts($args);
+
+            if (!empty($service_ids)) {
+                foreach ($service_ids as $service_id) {
+                    $service = obp_get_service($service_id);
+
+                    if (!$service || !method_exists($service, 'get_title')) {
+                        continue;
+                    }
+
+                    $items[] = [
+                        'id' => (string) $service->get_id(),
+                        'name' => $service->get_title(),
+                        'description' => method_exists($service, 'get_description') ? $service->get_description() : '',
+                        'price' => method_exists($service, 'get_price') ? (float) $service->get_price() : 0,
+                        'duration' => method_exists($service, 'get_duration_text') ? $service->get_duration_text() : '',
+                        'slug' => sanitize_title($service->get_title()),
+                    ];
+                }
+            }
         }
 
-        $args = [
-            'post_type' => 'obp_service',
+        if (!empty($items)) {
+            return $items;
+        }
+
+        $product_ids = get_posts([
+            'post_type' => 'product',
             'post_status' => 'publish',
             'posts_per_page' => absint($limit),
             'orderby' => 'title',
             'order' => 'ASC',
             'fields' => 'ids',
-        ];
+        ]);
 
-        $service_ids = get_posts($args);
+        foreach ($product_ids as $product_id) {
+            $product = wc_get_product($product_id);
 
-        if (empty($service_ids)) {
-            return [];
-        }
-
-        $items = [];
-
-        foreach ($service_ids as $service_id) {
-            $service = obp_get_service($service_id);
-
-            if (!$service || !method_exists($service, 'get_title')) {
+            if (!$product || !method_exists($product, 'get_name')) {
                 continue;
             }
 
             $items[] = [
-                'id' => (string) $service->get_id(),
-                'name' => $service->get_title(),
-                'description' => method_exists($service, 'get_description') ? $service->get_description() : '',
-                'price' => method_exists($service, 'get_price') ? (float) $service->get_price() : 0,
-                'duration' => method_exists($service, 'get_duration_text') ? $service->get_duration_text() : '',
-                'slug' => sanitize_title($service->get_title()),
+                'id' => (string) $product->get_id(),
+                'name' => $product->get_name(),
+                'description' => $product->get_short_description() ?: $product->get_description(),
+                'price' => (float) $product->get_price(),
+                'duration' => 'Bookable session',
+                'slug' => sanitize_title($product->get_name()),
             ];
         }
 

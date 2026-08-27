@@ -18,14 +18,25 @@ class AuraSpa_Integration_Booking_Mutation {
                 'notes' => ['type' => 'String'],
                 'amount' => ['type' => ['non_null' => 'Float']],
             ],
-            'outputType' => 'AuraSpaBooking',
-            'resolve' => static function ($root, $args) {
-                $customer_name = trim((string) ($args['customerName'] ?? ''));
-                $customer_email = trim((string) ($args['customerEmail'] ?? ''));
-                $service_id = trim((string) ($args['serviceId'] ?? ''));
-                $appointment_date = trim((string) ($args['appointmentDate'] ?? ''));
-                $appointment_time = trim((string) ($args['appointmentTime'] ?? ''));
-                $amount = floatval($args['amount'] ?? 0);
+            'outputFields' => [
+                'id' => ['type' => 'ID'],
+                'orderId' => ['type' => 'Int'],
+                'status' => ['type' => 'String'],
+                'serviceId' => ['type' => 'String'],
+                'amount' => ['type' => 'Float'],
+                'customerName' => ['type' => 'String'],
+                'customerEmail' => ['type' => 'String'],
+                'appointmentDate' => ['type' => 'String'],
+                'appointmentTime' => ['type' => 'String'],
+                'checkoutUrl' => ['type' => 'String'],
+            ],
+            'mutateAndGetPayload' => static function ($input, $context, $info) {
+                $customer_name = trim((string) ($input['customerName'] ?? ''));
+                $customer_email = trim((string) ($input['customerEmail'] ?? ''));
+                $service_id = trim((string) ($input['serviceId'] ?? ''));
+                $appointment_date = trim((string) ($input['appointmentDate'] ?? ''));
+                $appointment_time = trim((string) ($input['appointmentTime'] ?? ''));
+                $amount = floatval($input['amount'] ?? 0);
 
                 if (empty($customer_name) || empty($customer_email) || empty($service_id) || empty($appointment_date) || empty($appointment_time)) {
                     throw new \GraphQL\Error\Error(__('Missing required booking input.', 'auraspa-integration'));
@@ -41,17 +52,21 @@ class AuraSpa_Integration_Booking_Mutation {
                 $first_name = $customer_name_parts[0] ?? '';
                 $last_name = $customer_name_parts[1] ?? '';
 
-                $order->set_customer_note($args['notes'] ?? '');
+                $order->set_customer_note((string) ($input['notes'] ?? ''));
                 $order->set_billing_first_name($first_name);
                 $order->set_billing_last_name($last_name);
                 $order->set_billing_email($customer_email);
-                $order->set_billing_phone((string) ($args['phone'] ?? ''));
-                $order->add_product(wc_get_product($service_id), 1, [
-                    'subtotal' => $amount,
-                    'total' => $amount,
-                ]);
-                $order->calculate_totals();
+                $order->set_billing_phone((string) ($input['phone'] ?? ''));
 
+                $product = wc_get_product($service_id);
+                if ($product) {
+                    $order->add_product($product, 1, [
+                        'subtotal' => $amount,
+                        'total' => $amount,
+                    ]);
+                }
+
+                $order->calculate_totals();
                 $order->update_meta_data('_aura_service_id', $service_id);
                 $order->update_meta_data('_aura_booking_date', $appointment_date);
                 $order->update_meta_data('_aura_booking_time', $appointment_time);
@@ -60,7 +75,7 @@ class AuraSpa_Integration_Booking_Mutation {
                 $order->update_meta_data('_aura_booking_source', 'graphql');
                 $order->save();
 
-                do_action('auraspa_booking_order_created', $order->get_id(), $args);
+                do_action('auraspa_booking_order_created', $order->get_id(), $input);
 
                 return [
                     'id' => (string) $order->get_id(),

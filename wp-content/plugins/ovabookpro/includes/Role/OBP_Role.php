@@ -13,6 +13,7 @@ if ( ! class_exists('OBP_Role') ) {
 		public static function get_all(){
 
 			$vendor_id = OBP_User::get_vendor_id();
+			self::create_staff_role( $vendor_id );
 
 			$args = array(
 				'post_type' 		=> 'obp_role',
