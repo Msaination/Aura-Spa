@@ -1,0 +1,82 @@
+category,name,price,duration,note,type
+Massage,Swedish,From R250,60 min,,service
+Massage,"Aromatherapy Full Body (Detox, calming)",From R320,60–90 min,,service
+Massage,Deep tissue and hotstone,From R350,60–90 min,,service
+Massage,Hand or foot massage,From R180,30 min,,service
+Massage,Swedish Back and Neck,From R220,30 min,,service
+Massage,Hot stone Back and Neck,From R280,45 min,,service
+Massage,Mom to be,From R300,60 min,,service
+Body Treatment,Body Exfoliation (Scrub & Polish),From R280,45 min,,service
+Body Treatment,Brody Wrap,From R320,60 min,,service
+Facial,Biomedical Emporium Facial,From R350,60 min,,service
+Facial,Hydration facials,From R290,45–60 min,,service
+Facial,Brow Tint,From R180,15 min,,service
+Facial,Dermaplaning,From R500,45–60 min,,service
+Facial,Brightening facial,From R300,45–60 min,,service
+Facial,Clearing Facials,From R320,45–60 min,,service
+Facial,Micro needling,From R600,60 min,,service
+Facial,Dermaplanning,From R500,45–60 min,,service
+Facial,Derma Pen - DP,From R650,60 min,,service
+Body Treatment,Body Treatment,From R280,45 min,,service
+Body Treatment,Body Waxes,From R220,45 min,,service
+Body Treatment,Face Waxes,From R180,20–30 min,,service
+Body Treatment,Intimate Waxes,From R220,30 min,,service
+Body Treatment,Brodie Wrap,From R320,60 min,,service
+Wax,eyebrow lemination,From R80,15 min,,service
+Wax,Brow,From R70,15 min,,service
+Wax,Lip,From R50,10 min,,service
+Wax,Chin,From R50,10 min,,service
+Wax,Brow + Lip,From R120,20 min,,service
+Wax,Brow + Chin,From R120,20 min,,service
+Wax,Lip + Chin,From R100,20 min,,service
+Wax,Brow + Lip + Chin,From R150,25 min,,service
+Wax,Full Face,From R220,30 min,,service
+Wax,Ear or Nose or Brow,From R60,10 min,,service
+Wax,Ear + Nose,From R90,15 min,,service
+Wax,Ladies,From R180,30 min,,service
+Wax,Gents,From R200,30 min,,service
+Wax,Underarm,From R90,15 min,,service
+Wax,Half Arm,From R140,20 min,,service
+Wax,Full Arm,From R220,30 min,,service
+Wax,Half Leg,From R180,25 min,,service
+Wax,Three Quarter Leg,From R220,30 min,,service
+Wax,Full Leg,From R260,40 min,,service
+Wax,Stomach,From R120,20 min,,service
+Wax,Back,From R180,30 min,,service
+Wax,Chest,From R150,20 min,,service
+Wax,Back + Chest + Stomach,From R320,45 min,,service
+Wax,Bikini,From R170,20 min,,service
+Wax,Brazillian,From R220,30 min,,service
+Wax,Hollywood,From R260,35 min,,service
+Wax,Vajacial,From R320,45 min,,service
+Nails,MANICURES WOMEN,From R180,30–45 min,,service
+Nails,Gel Overlay,R230,45 min,,service
+Nails,Gel Tips,R260,45 min,,service
+Nails,Gel Toes,R210,45 min,,service
+Nails,Nail Art (per nail),From R20 per nail,Add-on,,service
+Nails,Soak,R80,15 min,,service
+Nails,Soak Acrylic,R140,20 min,,service
+Nails,Buff & Shine,R180,30 min,,service
+Nails,Paint Nails,R120,20 min,,service
+Nails,Paint Toes,R130,20 min,,service
+Nails,Mani express,R160,20 min,,service
+Nails,Express Hand Massage,R120,15 min,,service
+Nails,Hand Treatment,R180,30 min,,service
+Nails,Hand Massage,R140,20 min,,service
+Nails,Deluxe Mani,R220,45 min,,service
+Nails,MANICURES MEN,From R200,30–45 min,,service
+Nails,PEDICURES,From R220,30–45 min,,service
+Nails,Pedi Express,R180,25 min,,service
+Nails,Foot Treatment,R180,30 min,,service
+Nails,Foot massage,R160,20 min,,service
+Nails,Add on - Parriffin Wax,R80,15 min,,service
+Mini Me Collection,All Treatments 30Minutes,,,Children offering,service
+Mini Me Collection,Teen Glow Collection,,,Youth wellness offering,service
+Mini Me Collection,All Treatments 45min,,,Children offering,service
+Spa Facility,"Garden, Pool, Restaurant, Secure Parking",,,Facility access included in spa visit,product
+Extras,Fresh flowers,From R150,,,product
+Extras,Chocolates,From R150,,,product
+Extras,Balloons,From R120,,,product
+Extras,Cupcakes or celebration cake,From R180,,,product
+Extras,Gift bag,From R120,,,product
+Extras,Personalized celebration setup,From R250,,,product
