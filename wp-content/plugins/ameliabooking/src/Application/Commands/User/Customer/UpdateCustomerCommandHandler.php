@@ -1,0 +1,332 @@
+<?php
+
+namespace AmeliaBooking\Application\Commands\User\Customer;
+
+use AmeliaBooking\Application\Commands\CommandHandler;
+use AmeliaBooking\Application\Commands\CommandResult;
+use AmeliaBooking\Application\Common\Exceptions\AccessDeniedException;
+use AmeliaBooking\Application\Services\User\UserApplicationService;
+use AmeliaBooking\Domain\Common\Exceptions\InvalidArgumentException;
+use AmeliaBooking\Domain\Collection\Collection;
+use AmeliaBooking\Domain\Entity\Entities;
+use AmeliaBooking\Domain\Entity\User\AbstractUser;
+use AmeliaBooking\Domain\Entity\User\Customer;
+use AmeliaBooking\Domain\Factory\User\UserFactory;
+use AmeliaBooking\Domain\Services\Settings\SettingsService;
+use AmeliaBooking\Domain\ValueObjects\String\Name;
+use AmeliaBooking\Domain\ValueObjects\String\Password;
+use AmeliaBooking\Domain\ValueObjects\String\Phone;
+use AmeliaBooking\Infrastructure\Common\Exceptions\NotFoundException;
+use AmeliaBooking\Infrastructure\Common\Exceptions\QueryExecutionException;
+use AmeliaBooking\Infrastructure\Repository\Booking\Appointment\CustomerBookingRepository;
+use AmeliaBooking\Infrastructure\Repository\User\UserRepository;
+use AmeliaBooking\Infrastructure\Services\Mailchimp\AbstractMailchimpService;
+use AmeliaBooking\Infrastructure\WP\UserRoles\SuperAdminRoleService;
+
+/**
+ * Class UpdateCustomerCommandHandler
+ *
+ * @package AmeliaBooking\Application\Commands\User\Customer
+ */
+class UpdateCustomerCommandHandler extends CommandHandler
+{
+    /**
+     * @param UpdateCustomerCommand $command
+     *
+     * @return CommandResult
+     *
+     * @throws InvalidArgumentException
+     * @throws NotFoundException
+     * @throws QueryExecutionException
+     * @throws AccessDeniedException
+     */
+    public function handle(UpdateCustomerCommand $command)
+    {
+        $result = new CommandResult();
+
+        $this->checkMandatoryFields($command);
+
+        /** @var AbstractUser|null $provider */
+        $provider = null;
+
+        /** @var UserApplicationService $userAS */
+        $userAS = $this->getContainer()->get('application.user.service');
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getContainer()->get('domain.users.repository');
+
+        /** @var AbstractMailchimpService $mailchimpService */
+        $mailchimpService = $this->container->get('infrastructure.mailchimp.service');
+
+        $customerData = $command->getFields();
+
+        $customerData['type'] = Entities::CUSTOMER;
+
+        if (!$command->getPermissionService()->currentUserCanWrite(Entities::CUSTOMERS)) {
+            if ($command->getToken()) {
+                $provider = $command->getCabinetType() === 'provider'
+                    ? $userAS->getAuthenticatedUser($command->getToken(), false, 'providerCabinet')
+                    : null;
+
+                $oldUser = $provider === null
+                    ? $userAS->getAuthenticatedUser($command->getToken(), false, 'customerCabinet')
+                    : $userRepository->getById($customerData['id']);
+
+                if (
+                    $provider === null &&
+                    ($oldUser === null || $oldUser->getId()->getValue() !== intval($command->getArg('id')))
+                ) {
+                    $userRepository->rollback();
+
+                    $result->setResult(CommandResult::RESULT_ERROR);
+                    $result->setMessage('Could not retrieve user');
+                    $result->setData(
+                        [
+                            'reauthorize' => true
+                        ]
+                    );
+
+                    return $result;
+                }
+
+                // Customers updating their own profile via cabinet token cannot change their role.
+                if ($provider === null && $oldUser !== null) {
+                    $customerData['type'] = $oldUser->getType();
+                    $command->setField('type', $oldUser->getType());
+                }
+            } else {
+                throw new AccessDeniedException('You are not allowed to perform this action!');
+            }
+        } else {
+            $oldUser = $userRepository->getById($command->getArg('id'));
+            if ($oldUser === null) {
+                $result->setResult(CommandResult::RESULT_ERROR);
+                $result->setMessage('Could not retrieve user');
+                return $result;
+            }
+        }
+
+        if ($command->getField('externalId') === -1) {
+            $command->setField('externalId', null);
+        }
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->container->get('domain.settings.service');
+
+        /** @var AbstractUser $currentUser */
+        $currentUser = $this->container->get('logged.in.user');
+
+        $isProvider =
+            ($provider !== null && $provider->getType() === AbstractUser::USER_ROLE_PROVIDER) ||
+            ($currentUser !== null && $currentUser->getType() === AbstractUser::USER_ROLE_PROVIDER);
+
+        if ($isProvider) {
+            $providerId = $provider !== null ? $provider->getId()->getValue() : $currentUser->getId()->getValue();
+
+            $rolesSettings = $settingsService->getCategorySettings('roles');
+
+            if (empty($rolesSettings['allowWriteCustomers'])) {
+                throw new AccessDeniedException('You are not allowed to write user');
+            }
+
+            if (empty($rolesSettings['allowReadAllCustomers'])) {
+                /** @var Collection $providerCustomers */
+                $providerCustomers = $userRepository->getProviderAllowedCustomers(
+                    $providerId
+                );
+
+                $allowedCustomersIds = $providerCustomers->keys();
+
+                if (!in_array($command->getArg('id'), $allowedCustomersIds)) {
+                    throw new AccessDeniedException('You are not allowed to write user');
+                }
+            }
+        }
+
+        if (
+            $command->getField('email') === '' &&
+            !$settingsService->getSetting('roles', 'allowCustomerDeleteProfile') &&
+            (!$currentUser || $currentUser->getType() === AbstractUser::USER_ROLE_CUSTOMER)
+        ) {
+            $result->setResult(CommandResult::RESULT_ERROR);
+            $result->setMessage('Could not update user.');
+
+            return $result;
+        }
+
+        if (!isset($customerData['password'])) {
+            $customerData['translations'] = !empty($customerData['translations']) ? $customerData['translations'] : null;
+
+            $customerData['birthday'] = !empty($customerData['birthday']) ? $customerData['birthday'] : null;
+        }
+
+        $newUserData = array_merge($oldUser->toArray(), $customerData);
+
+        $newUserData = apply_filters('amelia_before_customer_updated_filter', $newUserData);
+
+        /** @var Customer $newUser */
+        $newUser = UserFactory::create($newUserData);
+
+        if ($isProvider && $command->getField('password')) {
+            $newUser->setPassword($oldUser->getPassword());
+        }
+
+        $oldExternalId = $oldUser->getExternalId() ? $oldUser->getExternalId()->getValue() : null;
+        $newExternalId = $newUser->getExternalId() ? $newUser->getExternalId()->getValue() : null;
+
+        if (
+            $oldExternalId !== $newExternalId &&
+            (
+                !$currentUser ||
+                !(
+                    $currentUser->getType() === AbstractUser::USER_ROLE_ADMIN ||
+                    $currentUser->getType() === AbstractUser::USER_ROLE_MANAGER
+                )
+            )
+        ) {
+           // Non-admin/manager cannot change externalId at all
+
+            $result->setResult(CommandResult::RESULT_ERROR);
+            $result->setMessage('Could not update user.');
+
+            return $result;
+        }
+
+        if (
+            $newExternalId &&
+            !$userAS->isRoleForExternalIdAllowed($newExternalId, Entities::CUSTOMER)
+        ) {
+            // Linking to existing WP user must pass role check
+
+            $result->setResult(CommandResult::RESULT_ERROR);
+            $result->setMessage('Could not update user.');
+
+            return $result;
+        }
+
+        if ($newExternalId && SuperAdminRoleService::userHasRole((int)$newExternalId)) {
+            $result->setResult(CommandResult::RESULT_CONFLICT);
+            $result->setMessage('Superadmin users cannot be assigned Amelia roles.');
+            $result->setData([]);
+
+            return $result;
+        }
+
+        // If the phone is not set and the old phone is set, set the phone and country phone iso to null
+        if (empty($customerData['phone']) && $oldUser->getPhone() && $oldUser->getPhone()->getValue()) {
+            $newUser->setPhone(new Phone(null));
+            $newUser->setCountryPhoneIso(new Name(null));
+        }
+
+        if (
+            $userRepository->getByEmail($newUser->getEmail()->getValue()) &&
+            $oldUser->getEmail()->getValue() !== $newUser->getEmail()->getValue()
+        ) {
+            $result->setResult(CommandResult::RESULT_CONFLICT);
+            $result->setMessage('Email already exist.');
+            $result->setData('This email is already in use.');
+
+            return $result;
+        }
+
+        // Provider cabinet sessions must use the provider as caller, not null (which would
+        // look like own-profile). Customer cabinet leaves $provider null so null = self.
+        $callerForWpCredentials = $provider !== null ? $provider : $currentUser;
+        $canWriteWpCredentials  = $userAS->canWriteLinkedWpCredentials($callerForWpCredentials, $oldUser);
+
+        $emailChanged = $oldUser->getEmail()->getValue() !== $newUser->getEmail()->getValue();
+        $linkedWpId   = $newUser->getExternalId() ? $newUser->getExternalId()->getValue() : null;
+
+        if ($linkedWpId && $emailChanged && !$canWriteWpCredentials) {
+            $result->setResult(CommandResult::RESULT_ERROR);
+            $result->setMessage('You are not allowed to change the linked WordPress account email.');
+
+            return $result;
+        }
+
+        $userRepository->beginTransaction();
+
+        if ($command->getField('password') && !$isProvider) {
+            $newPassword = new Password($command->getField('password'));
+
+            $userRepository->updateFieldById($command->getArg('id'), $newPassword->getValue(), 'password');
+
+            // Propagate to the linked WP user only when the caller is an admin or the
+            // customer updating their own profile. Blocks a Manager from resetting another
+            // user's WordPress password.
+            if ($linkedWpId && $canWriteWpCredentials) {
+                add_filter('amelia_user_profile_updated', '__return_true');
+                wp_set_password($command->getField('password'), $linkedWpId);
+                remove_filter('amelia_user_profile_updated', '__return_true');
+            }
+        }
+
+        do_action('amelia_before_customer_updated', $newUser ? $newUser->toArray() : null);
+
+        if (!$userRepository->update($command->getArg('id'), $newUser)) {
+            $userRepository->rollback();
+
+            $result->setResult(CommandResult::RESULT_ERROR);
+            $result->setMessage('Could not update user.');
+
+            return $result;
+        }
+
+        if ($command->getField('externalId') === 0) {
+            /** @var UserApplicationService $userAS */
+            $userAS = $this->getContainer()->get('application.user.service');
+
+            $userAS->setWpUserIdForNewUser($command->getArg('id'), $newUser, Entities::CUSTOMER);
+        } elseif ($linkedWpId) {
+            $wpUserData = [
+                'ID'         => $linkedWpId,
+                'first_name' => $newUser->getFirstName() ? $newUser->getFirstName()->getValue() : '',
+                'last_name'  => $newUser->getLastName() ? $newUser->getLastName()->getValue() : '',
+            ];
+
+            if ($emailChanged && $canWriteWpCredentials) {
+                $wpUserData['user_email'] = $newUser->getEmail() ? $newUser->getEmail()->getValue() : '';
+            }
+
+            add_filter('amelia_user_profile_updated', '__return_true');
+            wp_update_user($wpUserData);
+
+            if ($uid = get_current_user_id()) {
+                clean_user_cache($uid);
+            }
+
+            remove_filter('amelia_user_profile_updated', '__return_true');
+        }
+
+        if ($command->getField('email') === '') {
+            /** @var CustomerBookingRepository $bookingRepository */
+            $bookingRepository = $this->container->get('domain.booking.customerBooking.repository');
+
+            $bookingRepository->updateFieldByColumn('info', null, 'customerId', $oldUser->getId()->getValue());
+        }
+
+        if (
+            $settingsService->isFeatureEnabled('mailchimp') &&
+            $oldUser->getEmail() && $oldUser->getEmail()->getValue() &&
+            $newUser->getEmail() && $newUser->getEmail()->getValue()
+        ) {
+            $mailchimpService->addOrUpdateSubscriber($oldUser->getEmail()->getValue(), $newUser->toArray(), false);
+        }
+
+        $userRepository->commit();
+
+        do_action('amelia_after_customer_updated', $newUser ? $newUser->toArray() : null);
+
+        $result = $userAS->getAuthenticatedUserResponse(
+            $newUser,
+            $oldUser->getEmail()->getValue() !== $newUser->getEmail()->getValue(),
+            true,
+            $oldUser->getLoginType(),
+            'customer'
+        );
+
+        $result->setMessage('Successfully updated user');
+
+        return $result;
+    }
+}

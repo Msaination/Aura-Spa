@@ -1,0 +1,77 @@
+<?php
+
+namespace AmeliaBooking\Application\Commands\Square;
+
+use AmeliaBooking\Domain\Services\Logger\LoggerInterface;
+use AmeliaBooking\Application\Commands\CommandHandler;
+use AmeliaBooking\Application\Commands\CommandResult;
+use AmeliaBooking\Application\Common\Exceptions\AccessDeniedException;
+use AmeliaBooking\Application\Services\Validation\ValidationService;
+use AmeliaBooking\Domain\Common\Exceptions\InvalidArgumentException;
+use AmeliaBooking\Infrastructure\Common\Exceptions\NotFoundException;
+use AmeliaBooking\Infrastructure\Common\Exceptions\QueryExecutionException;
+use AmeliaBooking\Infrastructure\Repository\Payment\PaymentRepository;
+use Interop\Container\Exception\ContainerException;
+
+/**
+ * Class SquareRefundWebhookCommandHandler
+ *
+ * @package AmeliaBooking\Application\Commands\Square
+ */
+class SquareRefundWebhookCommandHandler extends CommandHandler
+{
+    /**
+     * @param SquareRefundWebhookCommand $command
+     *
+     * @return CommandResult
+     * @throws AccessDeniedException
+     * @throws NotFoundException
+     * @throws QueryExecutionException
+     * @throws ContainerException
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
+    public function handle(SquareRefundWebhookCommand $command)
+    {
+        /** @var PaymentRepository $paymentRepository */
+        $paymentRepository = $this->container->get('domain.payment.repository');
+
+        $data = $command->getField('data');
+
+        if (!ValidationService::verifySignature(json_encode($data), 'middleware', $command->getField('signature'))) {
+            throw new AccessDeniedException('Signature mismatch.');
+        }
+
+        $result = new CommandResult();
+
+        if ($data && !empty($data['object']['refund']['payment_id'])) {
+            $payments = $paymentRepository->getByEntityId($data['object']['refund']['payment_id'], 'transactionId');
+
+            if ($payments->length() === 0) {
+                $this->container->getLoggerService()->channel(LoggerInterface::CHANNEL_PAYMENT)->error(
+                    'Square refund webhook processing failed',
+                    [
+                        'paymentId' => $data['object']['refund']['payment_id'],
+                        'reason'    => 'Cannot find payment',
+                    ]
+                );
+
+                $result->setResult(CommandResult::RESULT_ERROR);
+                $result->setMessage('Cannot find payment');
+                $result->setData(['success' => false]);
+
+                return $result;
+            }
+
+            foreach ($payments->toArray() as $payment) {
+                $paymentRepository->updateFieldById($payment['id'], 'refunded', 'status');
+            }
+        }
+
+        $result->setResult(CommandResult::RESULT_SUCCESS);
+        $result->setMessage('Successfully updated payment status');
+        $result->setData(['success' => true]);
+
+        return $result;
+    }
+}

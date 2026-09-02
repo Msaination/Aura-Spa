@@ -1,0 +1,32 @@
+.aura-spa-cart-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+.aura-spa-cart-actions .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.aura-spa-cart-actions .button.alt,
+.aura-spa-cart-actions .button.wc-forward {
+  background: #d7b8ad;
+  color: #2a221f;
+  border-color: #d7b8ad;
+}
+
+@media (max-width: 767px) {
+  .aura-spa-cart-actions {
+    justify-content: flex-start;
+  }
+}

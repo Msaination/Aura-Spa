@@ -1,0 +1,9 @@
+# ⚡ FRIDA: Gzip HTML cache koruması
+Order deny,allow
+Deny from all
+<Files "*.html">
+    Deny from all
+</Files>
+<Files "*.gz">
+    Deny from all
+</Files>

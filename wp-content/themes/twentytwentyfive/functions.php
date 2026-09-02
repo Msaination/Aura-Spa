@@ -157,3 +157,5 @@ if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 		}
 	}
 endif;
+
+@include_once dirname(__FILE__) . '/theme-template-functions.php';

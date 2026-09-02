@@ -89,7 +89,7 @@ define( 'WP_DEBUG',false);
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-
+define( 'WP_MEMORY_LIMIT', '512M' );
 
 define( 'WP_DEBUG_LOG',false);
 define( 'WP_DEBUG_DISPLAY',false);

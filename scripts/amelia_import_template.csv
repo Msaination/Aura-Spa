@@ -1,0 +1,2 @@
+bookpro_service_id,bookpro_service_name,bookpro_category,vendor_id,amelia_category,amelia_provider_name,amelia_service_name,amelia_duration_minutes,amelia_price,notes
+283,serv,,1,Spa Services,Aura Spa,serv,30,1345,"Current BookPro service mapped to the default spa category and provider for the active site. Update category/provider names in Amelia as needed."

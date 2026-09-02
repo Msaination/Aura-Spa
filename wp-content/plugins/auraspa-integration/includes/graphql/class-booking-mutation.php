@@ -5,6 +5,66 @@ if (!defined('ABSPATH')) {
 }
 
 class AuraSpa_Integration_Booking_Mutation {
+    private static function create_bookpro_order_for_woocommerce_order($woo_order, $service_id, $amount, $customer_name, $customer_email, $appointment_date, $appointment_time, $phone, $notes) {
+        if (!$woo_order || !method_exists($woo_order, 'get_id') || !function_exists('obp_get_order')) {
+            return 0;
+        }
+
+        $meta_prefix = defined('OBP_METABOX') ? OBP_METABOX : 'obp_mb_';
+        $vendor_id = 0;
+
+        if (function_exists('obp_get_service')) {
+            $service = obp_get_service((int) $service_id);
+            if ($service && method_exists($service, 'get_vendor_id')) {
+                $vendor_id = (int) $service->get_vendor_id();
+            }
+        }
+
+        $order_id = wp_insert_post([
+            'post_type' => 'obp_order',
+            'post_status' => 'publish',
+            'post_title' => '#' . $woo_order->get_id() . ' ' . trim((string) $customer_name),
+            'meta_input' => [
+                $meta_prefix . 'vendor_id' => $vendor_id,
+                $meta_prefix . 'business_id' => 0,
+                $meta_prefix . 'order_status' => 'obp_pending',
+                $meta_prefix . 'customer_id' => get_current_user_id() ?: 0,
+                $meta_prefix . 'customer_name' => trim((string) $customer_name),
+                $meta_prefix . 'customer_email' => trim((string) $customer_email),
+                $meta_prefix . 'customer_phone' => trim((string) $phone),
+                $meta_prefix . 'customer_note' => trim((string) $notes),
+                $meta_prefix . 'woo_order_id' => (int) $woo_order->get_id(),
+                $meta_prefix . 'payment_method' => $woo_order->get_payment_method_title() ?: 'GraphQL',
+                $meta_prefix . 'payment_gateway' => 'Woocommerce',
+                $meta_prefix . 'total' => (float) $amount,
+                $meta_prefix . 'has_varies' => 'no',
+                $meta_prefix . 'subtotal' => (float) $amount,
+                $meta_prefix . 'system_fee' => 0,
+                $meta_prefix . 'tax_amount' => 0,
+                $meta_prefix . 'discount' => 0,
+                $meta_prefix . 'date_created' => current_time('timestamp'),
+                $meta_prefix . 'commission' => 0,
+                $meta_prefix . 'vendor_total' => (float) $amount,
+                $meta_prefix . 'start_date' => strtotime($appointment_date . ' ' . $appointment_time),
+                $meta_prefix . 'balance_status' => 'obp_pending',
+                $meta_prefix . 'allow_change' => 'yes',
+            ],
+        ], true);
+
+        if (is_wp_error($order_id)) {
+            return 0;
+        }
+
+        $bookpro_order = obp_get_order($order_id);
+        if ($bookpro_order && method_exists($bookpro_order, 'set_key')) {
+            $bookpro_order->set_key();
+        }
+
+        do_action('auraspa_bookpro_order_created', $order_id, $woo_order->get_id(), $service_id, $amount, $appointment_date, $appointment_time, $customer_name, $customer_email);
+
+        return (int) $order_id;
+    }
+
     public static function register() {
         register_graphql_mutation('createBooking', [
             'description' => __('Create a WooCommerce booking order and redirect the customer to PayFast.', 'auraspa-integration'),
@@ -74,6 +134,18 @@ class AuraSpa_Integration_Booking_Mutation {
                 $order->update_meta_data('_aura_booking_customer_email', $customer_email);
                 $order->update_meta_data('_aura_booking_source', 'graphql');
                 $order->save();
+
+                self::create_bookpro_order_for_woocommerce_order(
+                    $order,
+                    $service_id,
+                    $amount,
+                    $customer_name,
+                    $customer_email,
+                    $appointment_date,
+                    $appointment_time,
+                    (string) ($input['phone'] ?? ''),
+                    (string) ($input['notes'] ?? '')
+                );
 
                 do_action('auraspa_booking_order_created', $order->get_id(), $input);
 

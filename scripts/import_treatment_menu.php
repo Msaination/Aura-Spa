@@ -24,6 +24,69 @@ if (!class_exists('WC_Product')) {
 
 $meta_prefix = defined('OBP_METABOX') ? OBP_METABOX : 'obp_mb_';
 
+function aura_ensure_bookpro_vendor_data($service_ids = []) {
+    $vendor_id = 1;
+    $service_ids = array_values(array_unique(array_filter(array_map('intval', (array) $service_ids))));
+
+    $business_ids = get_posts([
+        'post_type' => 'obp_business',
+        'post_status' => 'publish',
+        'posts_per_page' => 1,
+        'fields' => 'ids',
+        'meta_query' => [[
+            'key' => OBP_METABOX . 'vendor_id',
+            'value' => $vendor_id,
+        ]],
+    ]);
+
+    if (empty($business_ids)) {
+        $business_id = wp_insert_post([
+            'post_type' => 'obp_business',
+            'post_status' => 'publish',
+            'post_title' => 'Aura Spa',
+            'post_name' => 'aura-spa',
+            'post_content' => 'Default BookPro business for Aura Spa services.',
+        ], true);
+
+        if (!is_wp_error($business_id)) {
+            update_post_meta($business_id, OBP_METABOX . 'vendor_id', $vendor_id);
+        }
+    }
+
+    $plan_ids = get_posts([
+        'post_type' => 'obp_plan',
+        'post_status' => 'publish',
+        'posts_per_page' => 1,
+        'fields' => 'ids',
+        'meta_query' => [[
+            'key' => OBP_METABOX . 'vendor_id',
+            'value' => $vendor_id,
+        ]],
+    ]);
+
+    if (empty($plan_ids)) {
+        $plan_id = wp_insert_post([
+            'post_type' => 'obp_plan',
+            'post_status' => 'publish',
+            'post_title' => '#1',
+            'meta_input' => [
+                OBP_METABOX . 'vendor_id' => $vendor_id,
+                OBP_METABOX . 'status' => 'open',
+                OBP_METABOX . 'service_type' => 'all_services',
+                OBP_METABOX . 'time_type' => 'full_time',
+                OBP_METABOX . 'service_ids' => implode('|', $service_ids),
+                OBP_METABOX . 'start_date' => strtotime('-1 day'),
+                OBP_METABOX . 'end_date' => strtotime('+1 year'),
+                OBP_METABOX . 'times' => [],
+            ],
+        ], true);
+
+        if (!is_wp_error($plan_id)) {
+            wp_update_post(['ID' => $plan_id, 'post_title' => '#' . $plan_id]);
+        }
+    }
+}
+
 function aura_normalize_price($value) {
     if ($value === null || $value === '') {
         return 0;
@@ -164,10 +227,28 @@ function aura_parse_duration($value) {
 function aura_title_aliases($title) {
     $base = trim((string) $title);
     $aliases = [
-        'hydration facials' => ['Hydration facials', 'Hydration Facial'],
+        'hydration facials' => ['Hydration Facial', 'Hydration facials'],
         'hydration facial' => ['Hydration Facial', 'Hydration facials'],
         'paint toes' => ['Paint Toes', 'Paint Toe'],
         'paint toe' => ['Paint Toe', 'Paint Toes'],
+        'dermaplaning' => ['Dermaplaning', 'Dermaplanning'],
+        'dermaplanning' => ['Dermaplaning', 'Dermaplanning'],
+        'brody wrap' => ['Brody Wrap', 'Brodie Wrap'],
+        'brodie wrap' => ['Brody Wrap', 'Brodie Wrap'],
+        'manicures women' => ['Manicures Women', 'MANICURES WOMEN'],
+        'pedicures' => ['Pedicures', 'PEDICURES'],
+        'eyebrow lemination' => ['Eyebrow Lemination', 'Eyebrow lemination', 'eyebrow lemination'],
+        'all treatments 30minutes' => ['All Treatments 30 Minutes', 'All Treatments 30Minutes'],
+        'all treatments 45min' => ['All Treatments 45 Minutes', 'All Treatments 45min'],
+        'brightening facial' => ['Brightening Facial', 'Brightening facial'],
+        'brightening facials' => ['Brightening Facial', 'Brightening facials'],
+        'clearing facials' => ['Clearing Facials', 'Clearing Facial'],
+        'body treatment' => ['Body Treatment'],
+        'body waxes' => ['Body Waxes'],
+        'face waxes' => ['Face Waxes'],
+        'intimate waxes' => ['Intimate Waxes'],
+        'all treatments 30 minutes' => ['All Treatments 30 Minutes', 'All Treatments 30Minutes'],
+        'all treatments 45 minutes' => ['All Treatments 45 Minutes', 'All Treatments 45min'],
     ];
 
     $normalized = strtolower($base);
@@ -204,6 +285,7 @@ function aura_find_post_by_title($post_type, $title) {
 $created = 0;
 $updated = 0;
 $skipped = 0;
+$all_service_ids = [];
 
 if (($handle = fopen($source, 'r')) !== false) {
     $header = fgetcsv($handle);
@@ -311,7 +393,7 @@ if (($handle = fopen($source, 'r')) !== false) {
         update_post_meta($service_id, $meta_prefix . 'price', (float) $price);
         update_post_meta($service_id, $meta_prefix . 'hour', (int) $duration_bits['hours']);
         update_post_meta($service_id, $meta_prefix . 'minute', (int) $duration_bits['minutes']);
-        update_post_meta($service_id, $meta_prefix . 'vendor_id', 0);
+        update_post_meta($service_id, $meta_prefix . 'vendor_id', 1);
         update_post_meta($service_id, $meta_prefix . 'type', 0);
         update_post_meta($service_id, $meta_prefix . 'use_on', 'booking_date');
         update_post_meta($service_id, $meta_prefix . 'note_price', $note);
@@ -319,10 +401,16 @@ if (($handle = fopen($source, 'r')) !== false) {
         update_post_meta($service_id, $meta_prefix . 'staff_ids', []);
         update_post_meta($service_id, '_aura_woo_product_id', $product_id);
         update_post_meta($service_id, '_aura_treatment_category', $category);
+        if ($category !== '') {
+            wp_set_object_terms($service_id, $category, 'obp_service_category', true);
+        }
         update_post_meta($service_id, '_aura_import_source', 'treatment_menu_csv');
+
+        $all_service_ids[] = (int) $service_id;
     }
 
     fclose($handle);
+    aura_ensure_bookpro_vendor_data($all_service_ids);
 }
 
 fwrite(STDOUT, "Imported treatment menu: created={$created}, updated={$updated}, skipped={$skipped}\n");

@@ -1,0 +1,129 @@
+<?php
+
+namespace AmeliaBooking\Infrastructure\WP\UserService;
+
+use AmeliaBooking\Infrastructure\WP\UserRoles\SuperAdminRoleService;
+use WP_Error;
+
+/**
+ * Class CreateWPUser
+ *
+ * @package AmeliaBooking\Infrastructure\WP\UserService
+ */
+class CreateWPUser
+{
+    /**
+     * @param string      $email
+     * @param string      $firstName
+     * @param string      $lastName
+     * @param string|null $role
+     * @param bool        $sendNewUserNotification
+     *
+     * @return mixed
+     */
+    public function create($email, $firstName, $lastName, $role = null, $sendNewUserNotification = true)
+    {
+        if (username_exists($email)) {
+            $user = get_user_by('login', $email);
+            if ($user) {
+                $this->addRole($role, $user->ID);
+                return $user->ID;
+            }
+            return null;
+        } elseif (email_exists($email)) {
+            $user = get_user_by('email', $email);
+            if ($user) {
+                $this->addRole($role, $user->ID);
+                return $user->ID;
+            }
+            return null;
+        }
+
+        $userId = wp_create_user($email, wp_generate_password(), $email);
+
+        wp_update_user(
+            [
+            'ID'         => $userId,
+            'first_name' => $firstName,
+            'last_name'  => $lastName,
+            ]
+        );
+
+        if ($userId instanceof WP_Error) {
+            return null;
+        }
+
+        $this->setRole($role, $userId);
+
+        if ($sendNewUserNotification) {
+            // Wrapped in try/catch because wp_new_user_notification() calls wp_mail() which uses
+            // WordPress's own PHPMailer with the mail() transport. On servers where mail() is disabled,
+            // this throws a fatal Error that would otherwise abort the entire booking process.
+            try {
+                wp_new_user_notification($userId, null, 'user');
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return (int)$userId;
+    }
+
+    /**
+     * @param int         $id
+     * @param string|null $role
+     *
+     * @return mixed
+     */
+    public function update($id, $role = null)
+    {
+        $this->addRole($role, $id);
+    }
+
+    /**
+     * @param string $role
+     * @param int    $userId
+     */
+    private function setRole($role, $userId)
+    {
+        if ($role) {
+            $user = new \WP_User($userId);
+            if ($this->isSuperAdminConflict($role, $user)) {
+                return;
+            }
+
+            if (get_role($role)) {
+                $user->set_role($role);
+            }
+        }
+    }
+
+    /**
+     * @param string $role
+     * @param int    $userId
+     */
+    private function addRole($role, $userId)
+    {
+        if ($role) {
+            $user = new \WP_User($userId);
+            if ($this->isSuperAdminConflict($role, $user)) {
+                return;
+            }
+
+            if (get_role($role)) {
+                $user->add_role($role);
+            }
+        }
+    }
+
+    /**
+     * @param string   $role
+     * @param \WP_User $user
+     *
+     * @return bool
+     */
+    private function isSuperAdminConflict($role, $user)
+    {
+        return in_array(SuperAdminRoleService::ROLE, (array)$user->roles, true) &&
+            in_array($role, ['wpamelia-customer', 'wpamelia-provider', 'wpamelia-manager'], true);
+    }
+}

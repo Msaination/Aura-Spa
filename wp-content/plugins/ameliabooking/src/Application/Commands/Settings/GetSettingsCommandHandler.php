@@ -1,0 +1,98 @@
+<?php
+
+namespace AmeliaBooking\Application\Commands\Settings;
+
+use AmeliaBooking\Application\Commands\CommandHandler;
+use AmeliaBooking\Application\Commands\CommandResult;
+use AmeliaBooking\Application\Common\Exceptions\AccessDeniedException;
+use AmeliaBooking\Domain\Entity\Entities;
+use AmeliaBooking\Domain\Services\Settings\SettingsService;
+use AmeliaBooking\Infrastructure\Services\Mailchimp\AbstractMailchimpService;
+use AmeliaBooking\Infrastructure\WP\Integrations\IvyForms\IvyFormsService;
+use AmeliaBooking\Infrastructure\WP\UserRoles\SuperAdminRoleService;
+use AmeliaVendor\Melograno\UsageTracker\Core\UsageTracker;
+use Interop\Container\Exception\ContainerException;
+use AmeliaVendor\Melograno\UsageTracker\Collectors\Plugin\AmeliaCollector;
+
+/**
+ * Class GetSettingsCommandHandler
+ *
+ * @package AmeliaBooking\Application\Commands\Settings
+ */
+class GetSettingsCommandHandler extends CommandHandler
+{
+    /**
+     * @return CommandResult
+     * @throws ContainerException
+     * @throws AccessDeniedException
+     */
+    public function handle(GetSettingsCommand $command)
+    {
+        $result = new CommandResult();
+
+        if (!$command->getPermissionService()->currentUserCanRead(Entities::SETTINGS)) {
+            throw new AccessDeniedException('You are not allowed to read settings.');
+        }
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->getContainer()->get('domain.settings.service');
+
+        $settings = $settingsService->getAllSettingsCategorized();
+
+        $superAdminService = new SuperAdminRoleService();
+        $settings['isSuperAdmin'] = $superAdminService->isCurrentUserSuperAdmin();
+        $settings['isSuperAdminRoleAvailable'] = SuperAdminRoleService::isAvailable();
+        $settings['superAdminCount'] = $superAdminService->countSuperAdmins();
+
+        if ($settings['activation']['purchaseCodeStore'] !== '' && $settings['activation']['active']) {
+            $settings['activation']['purchaseCodeStore'] = null;
+        }
+
+        if (!$superAdminService->canAccessActivationSettings()) {
+            $settings['activation']['purchaseCodeStore'] = null;
+            $settings['activation']['envatoTokenEmail'] = '';
+            $settings['activation']['licence'] = null;
+            $settings['activation']['licenseActivatorUserId'] = null;
+        }
+
+        if (!empty($settings['payments']['square'])) {
+            $settings['payments']['square']['phpVersion'] = phpversion();
+        }
+
+        $mailchimpLists = [];
+        if ($settingsService->isFeatureEnabled('mailchimp') && !empty($settings['mailchimp']['accessToken'])) {
+            /** @var AbstractMailchimpService $mailchimpService */
+            $mailchimpService = $this->getContainer()->get('infrastructure.mailchimp.service');
+            $mailchimpLists = $mailchimpService->getLists();
+            if (!empty($mailchimpLists)) {
+                if (!$settings['mailchimp']['list']) {
+                    $settings['mailchimp']['list'] = $mailchimpLists[0]['id'];
+                    $settingsService->setCategorySettings('mailchimp', $settings['mailchimp']);
+                }
+            }
+        }
+
+        $result->setResult(CommandResult::RESULT_SUCCESS);
+        $result->setMessage('Successfully retrieved settings.');
+
+        if (isset($settings['general'])) {
+            $settings['general'] = array_merge($settings['general'], UsageTracker::getSettings(new AmeliaCollector()));
+        }
+
+        $settings = apply_filters('amelia_get_settings_filter', $settings);
+
+        do_action('amelia_get_settings', $settings);
+
+        $result->setData(
+            [
+                'settings' => $settings,
+                'additionalData' => [
+                    'mailchimpLists' => $mailchimpLists,
+                    'ivyForms'       => IvyFormsService::getForms(),
+                ]
+            ]
+        );
+
+        return $result;
+    }
+}

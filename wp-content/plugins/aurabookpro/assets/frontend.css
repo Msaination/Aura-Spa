@@ -1,0 +1,513 @@
+.aurabookpro-booking {
+  max-width: 760px;
+  margin: 24px auto;
+  padding: 28px 26px;
+  border: 1px solid #E4D8CB;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9f5f2 100%);
+  box-shadow: 0 20px 42px rgba(160, 144, 134, 0.08);
+}
+
+.aurabookpro-form {
+  display: grid;
+  gap: 18px;
+}
+
+.aurabookpro-field {
+  display: grid;
+  gap: 8px;
+}
+
+.aurabookpro-name-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.aurabookpro-field label {
+  color: #433d3a;
+  font-weight: 600;
+}
+
+.aurabookpro-field input,
+.aurabookpro-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid #d9cfc6;
+  border-radius: 10px;
+  background: #fff;
+  color: #2b2827;
+  box-shadow: inset 0 1px 2px rgba(84, 69, 64, 0.03);
+}
+
+.aurabookpro-field input:focus,
+.aurabookpro-field select:focus {
+  border-color: #A09086;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(160, 144, 134, 0.12);
+}
+
+.aurabookpro-submit {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #CDC6C3 0%, #A09086 100%);
+  color: #fff;
+  padding: 13px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.aurabookpro-submit:hover {
+  transform: translateY(-1px);
+}
+
+.aurabookpro-submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.aurabookpro-message {
+  min-height: 24px;
+  font-weight: 600;
+  color: #4b403d;
+}
+
+.aurabookpro-success-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  margin-top: 8px;
+  border: 1px solid #DCC9BF;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8f4f1 0%, #f4efe9 100%);
+  color: #342f2d;
+}
+
+.aurabookpro-success-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2b2725;
+}
+
+.aurabookpro-success-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 0.96rem;
+  color: #5b514d;
+}
+
+.aurabookpro-checkout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #A09086;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.aurabookpro-checkout-summary-wrap {
+  margin: 0 0 24px;
+}
+
+.aurabookpro-checkout-summary {
+  display: grid;
+  gap: 14px;
+  padding: 20px 18px 18px;
+  border: 1px solid #E4D8CB;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f9f5f2 0%, #f4eee9 100%);
+  box-shadow: 0 18px 30px rgba(160, 144, 134, 0.06);
+}
+
+.aurabookpro-summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.aurabookpro-checkout-summary h3 {
+  margin: 0;
+  font-size: 1.06rem;
+  letter-spacing: 0.02em;
+  color: #2b2725;
+}
+
+.aurabookpro-summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.aurabookpro-summary-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #F3EDE8;
+  color: #4d413d;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.aurabookpro-summary-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #E7F1EB;
+  border: 1px solid #C4DCCB;
+  color: #255D43;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.aurabookpro-checkout-summary-item {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #E2D3C9;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.52);
+}
+
+.aurabookpro-checkout-roundel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #CDC6C3 0%, #A09086 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.aurabookpro-checkout-copy {
+  display: grid;
+  gap: 4px;
+  font-size: 0.96rem;
+  color: #4a413d;
+  line-height: 1.45;
+}
+
+.aurabookpro-checkout-copy strong {
+  color: #2b2725;
+  font-size: 1.02rem;
+}
+
+.aurabookpro-coupon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #F4EEE9;
+  border: 1px solid #E2D3C9;
+  color: #4a413d;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.aurabookpro-coupon-pill span {
+  color: #7a6e68;
+}
+
+.aurabookpro-finance-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #E2D3C9;
+}
+
+.aurabookpro-finance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.96rem;
+  color: #4a413d;
+}
+
+.aurabookpro-finance-row.compact {
+  font-size: 0.9rem;
+}
+
+.aurabookpro-finance-row.discounted {
+  color: #7d2f2b;
+}
+
+.aurabookpro-finance-row.total {
+  padding-top: 8px;
+  border-top: 1px solid #E2D3C9;
+  font-weight: 700;
+  color: #2b2725;
+}
+
+.aurabookpro-coupon-review {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #E4D8CB;
+  background: #F8F4F1;
+  border-radius: 10px;
+  font-size: 0.96rem;
+  color: #4a413d;
+}
+
+.aurabookpro-coupon-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.aurabookpro-order-confirmation {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+  padding: 22px 20px;
+  border: 1px solid #E4D8CB;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f9f5f2 0%, #f4eee9 100%);
+  box-shadow: 0 18px 30px rgba(160, 144, 134, 0.06);
+}
+
+.aurabookpro-order-confirmation h3 {
+  margin: 0;
+  color: #2b2725;
+  font-size: clamp(1.6rem, 2vw, 2.1rem);
+  line-height: 1.15;
+}
+
+.aurabookpro-order-confirmation p {
+  margin: 0;
+  color: #4a413d;
+  font-size: 1rem;
+}
+
+.aurabookpro-order-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.aurabookpro-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.aurabookpro-status-pending { background: #F4EDE7; color: #6d584f; }
+.aurabookpro-status-confirmed { background: #E6F1EA; color: #2d5f46; }
+.aurabookpro-status-completed { background: #D9E8DD; color: #214c3f; }
+.aurabookpro-status-cancelled { background: #F5E2E0; color: #7a3d38; }
+.aurabookpro-status-refunded { background: #F3E3D8; color: #7c4f3c; }
+
+.aurabookpro-booking-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  background: rgba(255,255,255,0.58);
+  border: 1px solid #E2D3C9;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(160, 144, 134, 0.04);
+}
+
+.aurabookpro-booking-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.aurabookpro-booking-card__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6e68;
+  font-weight: 700;
+}
+
+.aurabookpro-booking-card__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #E5EFE7;
+  border: 1px solid #B9D3C0;
+  color: #245a40;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.aurabookpro-booking-card__body {
+  display: grid;
+  gap: 12px;
+}
+
+.aurabookpro-booking-card__service {
+  font-size: clamp(1.2rem, 1.6vw, 1.6rem);
+  line-height: 1.2;
+  font-weight: 700;
+  color: #2b2725;
+}
+
+.aurabookpro-booking-card__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 10px;
+  border-top: 1px solid #E8D9CF;
+  color: #4a413d;
+}
+
+.aurabookpro-booking-card__meta span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a6e68;
+}
+
+.aurabookpro-booking-card__meta strong {
+  color: #2b2725;
+  text-align: right;
+  font-size: 0.98rem;
+}
+
+.aurabookpro-order-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.aurabookpro-order-detail {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #E2D3C9;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.5);
+}
+
+.aurabookpro-order-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a6e68;
+}
+
+.aurabookpro-order-value {
+  color: #2b2725;
+  font-size: 0.98rem;
+}
+
+.aurabookpro-order-totals {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #E2D3C9;
+}
+
+.aurabookpro-refund-banner {
+  margin-top: 2px;
+  padding: 12px 14px;
+  border: 1px solid #E8CFA9;
+  background: #FFF7EA;
+  border-radius: 10px;
+  color: #5b4317;
+}
+
+.aurabookpro-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.aurabookpro-order-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 16px;
+  border-radius: 10px;
+  background: #A09086;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.aurabookpro-order-link.secondary {
+  background: #F3ECE8;
+  color: #413b39;
+  border: 1px solid #E2D3C9;
+}
+
+.woocommerce-order .woocommerce-order-details__title,
+.woocommerce-order .woocommerce-customer-details h2,
+.woocommerce-order .woocommerce-column__title,
+.woocommerce-order .woocommerce-order-details h2 {
+  color: #2b2725;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.woocommerce-order .shop_table {
+  border: 1px solid #E4D8CB;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(160, 144, 134, 0.04);
+}
+
+.woocommerce-order .shop_table th,
+.woocommerce-order .shop_table td {
+  border-color: #E2D3C9;
+  padding: 12px 14px;
+}
+
+.woocommerce-order .shop_table thead th {
+  background: #F5F0EC;
+  color: #3d3633;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.woocommerce-checkout .aurabookpro-checkout-summary-wrap,
+.woocommerce-checkout .aurabookpro-coupon-review,
+.woocommerce-order-received .aurabookpro-order-confirmation {
+  margin-bottom: 18px;
+}
