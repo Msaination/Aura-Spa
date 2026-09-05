@@ -30,6 +30,7 @@ wp-content/upgrade/
 wp-content/backup-db/
 wp-content/temp/
 wp-content/debug.log
+wp-content/ai1wm-backups/
 
 # Local environment files
 .env
@@ -42,3 +43,8 @@ coverage/
 # WordPress Studio / local-specific runtime files
 wp-content/mu-plugins/sqlite-database-integration/
 wp-content/db.php
+
+# Generated local backup/import artifacts
+wp-content/ai1wm-backups/
+wp-content/plugins/all-in-one-wp-migration/
+wp-content/updraft/
